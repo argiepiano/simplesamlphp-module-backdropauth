@@ -1,12 +1,12 @@
 ## Introduction
 
-Drupal + SimpleSAMLphp + backdropauth = Complete SAML Identity Provider (IdP)
+Backdrop + SimpleSAMLphp + backdropauth = Complete SAML Identity Provider (IdP)
 
-Users interact with Drupal to create accounts, manage accounts, and authenticate. SAML SPs interact with [SimpleSAMLphp](https://simplesamlphp.org/). Drupalauth ties Drupal to SimpleSAMLphp.
+Users interact with Backdrop to create accounts, manage accounts, and authenticate. SAML SPs interact with [SimpleSAMLphp](https://simplesamlphp.org/). Backdropauth ties Backdrop to SimpleSAMLphp.
 
 The backdropauth module for simpleSAMLphp makes it easy to create a SAML or Shibboleth identity provider (IdP) by enabling authentication of users against a Backdrop CMS site on the same server. This allows the administrator to leverage the user management and integration capabilities of [Backdrop CMS](http://backdropcms.org) for managing the identity life cycle.
 
-NOTE: This is software establishes a SAML identity provider (IdP) using Drupal as the user database instead of LDAP. If you want to establish your Drupal site as a SAML service provider (SP) connected to a SAML or Shibboleth IdP, see the [simplesamlphp_auth](https://github.com/backdrop-contrib/simplesamlphp_auth) module for Backdrop CMS.
+NOTE: This is software establishes a SAML identity provider (IdP) using Backdrop as the user database instead of LDAP. If you want to establish your Backdrop site as a SAML service provider (SP) connected to a SAML or Shibboleth IdP, see the [simplesamlphp_auth](https://github.com/backdrop-contrib/simplesamlphp_auth) module for Backdrop CMS.
 
 ### backdropauth SimpleSAMLphp module
 
@@ -43,7 +43,7 @@ Configure the authentication source by putting following code into `simplesamlph
 'backdrop-userpass' => array('backdropauth:External',
 
  // The filesystem path of the Backdrop directory.
- 'backdroproot' => '/var/www/drupal',
+ 'backdroproot' => '/var/www/backdrop',
 
  // Whether to turn on debug
  'debug' => true,
@@ -54,7 +54,7 @@ Configure the authentication source by putting following code into `simplesamlph
  // the URL of the Backdrop login page
  'backdrop_login_url' => 'https://www.example.com/user/login',
 
- // Which attributes should be retrieved from the Drupal site.
+ // Which attributes should be retrieved from the Backdrop site.
  'attributes' => array(
    array('backdropuservar'   => 'uid',  'callit' => 'uid'),
    array('backdropuservar' => 'name', 'callit' => 'cn'),
@@ -78,13 +78,13 @@ Configure the authentication source by putting following code into `simplesamlph
 ```php
 'backdrop-userpass' => array('backdropauth:UserPass',
 
-    // The filesystem path of the Drupal directory.
-    'backdroproot' => '/home/drupal',            
+    // The filesystem path of the Backdrop directory.
+    'backdroproot' => '/home/backdrop',            
 
     // Whether to turn on debug
     'debug' => true,
 
-    // Which attributes should be retrieved from the Drupal site.
+    // Which attributes should be retrieved from the Backdrop site.
     // This can be an associate array of attribute names, or NULL, in which case
     // all attributes are fetched.
     //
@@ -103,7 +103,7 @@ Configure the authentication source by putting following code into `simplesamlph
     //                     ),
     //
     // The value for 'backdropuservar' is the variable name for the attribute in the
-    // Drupal user object.
+    // Backdrop user object.
     //
     // The value for 'callit' is the name you want the attribute to have when it's
     // returned after authentication. You can use the same value in both or you can
@@ -122,8 +122,8 @@ Configure the authentication source by putting following code into `simplesamlph
 ```
 
 ## Credits
-This is a Backdrop CMS ported version of a project originally created for Drupal 7, which is currently available at https://github.com/drupalauth/simplesamlphp-module-drupalauth
+This is a Backdrop CMS ported version of a project originally created for Backdrop 7, which is currently available at https://github.com/drupalauth/simplesamlphp-module-drupalauth
 
-This ported version is based on the 1.7.x branch of that original project. The commit history of that branch has been preserved here. We are very thankful to all past contributors to the Drupal branch that have made this port possible. 
+This ported version is based on the 1.7.x branch of that original project. The commit history of that branch has been preserved here. We are very thankful to all past contributors to the Backdrop branch that have made this port possible. 
 
 - Ported by [argiepiano](https://github.com/argiepiano)
