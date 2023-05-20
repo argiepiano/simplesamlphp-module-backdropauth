@@ -1,10 +1,10 @@
-drupalauth is a SimpleSAMLphp module that provides an Authentication
+backdropauth is a SimpleSAMLphp module that provides an Authentication
 Source for authenticating users against a local Drupal site.
 
 Copyright 2011-2012 SIL International http://www.sil.org
 Written by Steve Moitozo <steve_moitozo@sil.org>
 
-drupalauth is licensed under the CC-GNU LGPL version 2.1.
+backdropauth is licensed under the CC-GNU LGPL version 2.1.
 http://creativecommons.org/licenses/LGPL/2.1/
 
 This library is free software; you can redistribute it and/or

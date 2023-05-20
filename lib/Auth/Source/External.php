@@ -1,18 +1,19 @@
 <?php
 
 /**
- * Drupalath authentication source for using Drupal's login page.
+ * Backdropauth authentication source for using Backdrop's login page.
  *
  * Copyright SIL International, Steve Moitozo, <steve_moitozo@sil.org>, http://www.sil.org
  *
  * This class is an authentication source which is designed to
- * more closely integrate with a Drupal site. It causes the user to be
- * delivered to Drupal's login page, if they are not already authenticated.
+ * more closely integrate with a Backdrop site. It causes the user to be
+ * delivered to Backdrop's login page, if they are not already authenticated.
  *
  *
- * The homepage of this project: http://code.google.com/p/drupalauth/
+ * This project is a port of drupalauth found at: 
+ * https://github.com/drupalauth/simplesamlphp-module-drupalauth
  *
- * !!! NOTE WELLL !!!
+ * !!! NOTE WELL !!!
  *
  * You must configure store.type in config/config.php to be something
  * other than phpsession, or this module will not work. SQL and memcache
@@ -20,40 +21,40 @@
  * redirection when the SimpleSAMLphp login page should be presented.
  *
  *
- * You must install the drupalauth4ssp module into Drupal to complete the
- * login integration, since this class will send users to the Drupal login
+ * You must install the backdropauth4ssp module into Backdrop to complete the
+ * login integration, since this class will send users to the Backdrop login
  * page to authenticate instead of presenting a SimpleSAMLphp login page.
  *
  * -------------------------------------------------------------------
  *
  * To use this put something like this into config/authsources.php:
  *
- *  'drupal-userpass' => array(
- *    'drupalauth:External',
+ *  'backdrop-userpass' => array(
+ *    'backdropauth:External',
  *
- *    // The filesystem path of the Drupal directory.
- *    'drupalroot' => '/var/www/drupal-7.0',
+ *    // The filesystem path of the Backdrop directory.
+ *    'backdroproot' => '/var/www/backdrop-1.0.0',
  *
  *    // Whether to turn on debug
  *    'debug' => true,
  *
- *    // the URL of the Drupal logout page
- *    'drupal_logout_url' => 'https://www.example.com/drupal7/user/logout',
+ *    // the URL of the Backdrop logout page
+ *    'backdrop_logout_url' => 'https://www.example.com/backdrop/user/logout',
  *
- *    // the URL of the Drupal login page
- *    'drupal_login_url' => 'https://www.example.com/drupal7/user',
+ *    // the URL of the Backdrop login page
+ *    'backdrop_login_url' => 'https://www.example.com/backdrop/user',
  *
- *    // Which attributes should be retrieved from the Drupal site.
+ *    // Which attributes should be retrieved from the Backdrop site.
  *
  *              'attributes' => array(
- *                                    array('drupaluservar'   => 'uid',  'callit' => 'uid'),
- *                                     array('drupaluservar' => 'name', 'callit' => 'cn'),
- *                                     array('drupaluservar' => 'mail', 'callit' => 'mail'),
- *                                     array('drupaluservar' => 'field_first_name',  'callit' => 'givenName'),
- *                                     array('drupaluservar' => 'field_last_name',   'callit' => 'sn'),
- *                                     array('drupaluservar' => 'field_organization','callit' => 'ou'),
- *                                     array('drupaluservar' => 'field_country:iso2','callit' => 'country'),
- *                                     array('drupaluservar' => 'roles','callit' => 'roles'),
+ *                                    array('backdropuservar'   => 'uid',  'callit' => 'uid'),
+ *                                     array('backdropuservar' => 'name', 'callit' => 'cn'),
+ *                                     array('backdropuservar' => 'mail', 'callit' => 'mail'),
+ *                                     array('backdropuservar' => 'field_first_name',  'callit' => 'givenName'),
+ *                                     array('backdropuservar' => 'field_last_name',   'callit' => 'sn'),
+ *                                     array('backdropuservar' => 'field_organization','callit' => 'ou'),
+ *                                     array('backdropuservar' => 'field_country:iso2','callit' => 'country'),
+ *                                     array('backdropuservar' => 'roles','callit' => 'roles'),
  *                                   ),
  *  ),
  *
@@ -67,20 +68,20 @@
  *
  * If you want to pick and choose do it like this:
  * 'attributes' => array(
- *          array('drupaluservar' => 'uid',  'callit' => 'uid),
- *                     array('drupaluservar' => 'name', 'callit' => 'cn'),
- *                     array('drupaluservar' => 'mail', 'callit' => 'mail'),
- *                     array('drupaluservar' => 'roles','callit' => 'roles'),
+ *          array('backdropuservar' => 'uid',  'callit' => 'uid),
+ *                     array('backdropuservar' => 'name', 'callit' => 'cn'),
+ *                     array('backdropuservar' => 'mail', 'callit' => 'mail'),
+ *                     array('backdropuservar' => 'roles','callit' => 'roles'),
  *                      ),
  *
  *  If you want to take another field column beside value you can declare it
  *  like this:
  * 'attributes' => array(
- *                       array('drupaluservar' => field_country:iso2','callit' => 'country'),
+ *                       array('backdropuservar' => field_country:iso2','callit' => 'country'),
  *                      ),
  *
- *  The value for 'drupaluservar' is the variable name for the attribute in the
- *  Drupal user object.
+ *  The value for 'backdropuservar' is the variable name for the attribute in the
+ *  Backdrop user object.
  *
  *  The value for 'callit' is the name you want the attribute to have when it's
  *  returned after authentication. You can use the same value in both or you can
@@ -89,10 +90,10 @@
  *
  *
  * @author Steve Moitozo <steve_moitozo@sil.org>, SIL International
- * @package drupalauth
+ * @package backdropauth
  * @version $Id$
  */
-class sspmod_drupalauth_Auth_Source_External extends SimpleSAML_Auth_Source {
+class sspmod_backdropauth_Auth_Source_External extends \SimpleSAML\Auth\Source {
 
   /**
    * Whether to turn on debugging
@@ -100,12 +101,12 @@ class sspmod_drupalauth_Auth_Source_External extends SimpleSAML_Auth_Source {
   private $debug;
 
   /**
-   * The Drupal installation directory
+   * The Backdrop installation directory
    */
-  private $drupalroot;
+  private $backdroproot;
 
   /**
-   * The Drupal user attributes to use, NULL means use all available
+   * The Backdrop user attributes to use, NULL means use all available
    */
   private $attributes;
 
@@ -125,14 +126,14 @@ class sspmod_drupalauth_Auth_Source_External extends SimpleSAML_Auth_Source {
   private $cookie_salt;
 
   /**
-   * The logout URL of the Drupal site
+   * The logout URL of the Backdrop site
    */
-  private $drupal_logout_url;
+  private $backdrop_logout_url;
 
   /**
-   * The login URL of the Drupal site
+   * The login URL of the Backdrop site
    */
-  private $drupal_login_url;
+  private $backdrop_login_url;
 
 	/**
 	 * Constructor for this authentication source.
@@ -140,50 +141,48 @@ class sspmod_drupalauth_Auth_Source_External extends SimpleSAML_Auth_Source {
 	 * @param array $info  Information about this authentication source.
 	 * @param array $config  Configuration.
 	 */
-	public function __construct($info, $config) {
-    assert('is_array($info)');
-    assert('is_array($config)');
+	public function __construct(array $info, array $config) {
 
     /* Call the parent constructor first, as required by the interface. */
     parent::__construct($info, $config);
 
 
     /* Get the configuration for this module */
-    $drupalAuthConfig = new sspmod_drupalauth_ConfigHelper($config,
+    $backdropAuthConfig = new sspmod_backdropauth_ConfigHelper($config,
       'Authentication source ' . var_export($this->authId, TRUE));
 
-    $this->debug       = $drupalAuthConfig->getDebug();
-    $this->attributes  = $drupalAuthConfig->getAttributes();
-    $this->cookie_name = $drupalAuthConfig->getCookieName();
-    $this->drupal_logout_url = $drupalAuthConfig->getDrupalLogoutURL();
-    $this->drupal_login_url = $drupalAuthConfig->getDrupalLoginURL();
+    $this->debug       = $backdropAuthConfig->getDebug();
+    $this->attributes  = $backdropAuthConfig->getAttributes();
+    $this->cookie_name = $backdropAuthConfig->getCookieName();
+    $this->backdrop_logout_url = $backdropAuthConfig->getBackdropLogoutURL();
+    $this->backdrop_login_url = $backdropAuthConfig->getBackdropLoginURL();
 
-    if (!defined('DRUPAL_ROOT')) {
-      define('DRUPAL_ROOT', $drupalAuthConfig->getDrupalroot());
+    if (!defined('BACKDROP_ROOT')) {
+      define('BACKDROP_ROOT', $backdropAuthConfig->getBackdroproot());
     }
 
-    $ssp_config = SimpleSAML_Configuration::getInstance();
+    $ssp_config = \SimpleSAML\Configuration::getInstance();
     $this->cookie_path = '/' . $ssp_config->getValue('baseurlpath');
     $this->cookie_salt = $ssp_config->getValue('secretsalt');
 
     $a = getcwd();
-    chdir(DRUPAL_ROOT);
+    chdir(BACKDROP_ROOT);
 
-    /* Include the Drupal bootstrap */
-    //require_once(DRUPAL_ROOT.'/includes/common.inc');
-    require_once(DRUPAL_ROOT.'/includes/bootstrap.inc');
-    require_once(DRUPAL_ROOT.'/includes/file.inc');
+    /* Include the Backdrop bootstrap */
+    //require_once(BACKDROP_ROOT.'/includes/common.inc');
+    require_once(BACKDROP_ROOT.'/core/includes/bootstrap.inc');
+    require_once(BACKDROP_ROOT.'/core/includes/file.inc');
 
-    /* Using DRUPAL_BOOTSTRAP_FULL means that SimpleSAMLphp must use an session storage
+    /* Using BACKDROP_BOOTSTRAP_FULL means that SimpleSAMLphp must use an session storage
      * mechanism other than phpsession (see: store.type in config.php). However, this trade-off
      * prevents the need for hackery here and makes this module work better in different environments.
      */
-    drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
+    backdrop_bootstrap(BACKDROP_BOOTSTRAP_FULL);
 
-    // we need to be able to call Drupal user function so we load some required modules
-    drupal_load('module', 'system');
-    drupal_load('module', 'user');
-    drupal_load('module', 'field');
+    // we need to be able to call Backdrop user function so we load some required modules
+    backdrop_load('module', 'system');
+    backdrop_load('module', 'user');
+    backdrop_load('module', 'field');
 
     chdir($a);
   }
@@ -196,9 +195,9 @@ class sspmod_drupalauth_Auth_Source_External extends SimpleSAML_Auth_Source {
 	 */
 	private function getUser() {
 
-    $drupaluid          = NULL;
+    $backdropuid          = NULL;
 
-    // pull the Drupal uid out of the cookie
+    // pull the Backdrop uid out of the cookie
     if(isset($_COOKIE[$this->cookie_name]) && $_COOKIE[$this->cookie_name]) {
       $strCookie = $_COOKIE[$this->cookie_name];
       $arrCookie = explode(':',$strCookie);
@@ -209,9 +208,9 @@ class sspmod_drupalauth_Auth_Source_External extends SimpleSAML_Auth_Source {
 
         // Make sure no one manipulated the hash or the uid in the cookie before we trust the uid
         if(sha1($this->cookie_salt . $arrCookie[1]) == $arrCookie[0]) {
-            $drupaluid = $arrCookie[1];
+            $backdropuid = $arrCookie[1];
         } else {
-            throw new SimpleSAML_Error_Exception('Cookie hash invalid. This indicates either tampering or an out of date drupal4ssp module.');
+            throw new \SimpleSAML\Error\Exception('Cookie hash invalid. This indicates either tampering or an out of date backdrop4ssp module.');
         }
       }
 
@@ -223,19 +222,19 @@ class sspmod_drupalauth_Auth_Source_External extends SimpleSAML_Auth_Source {
       setcookie($this->cookie_name, "", time() - 3600, $this->cookie_path);
     }
 
-    if (!empty($drupaluid)) {
+    if (!empty($backdropuid)) {
 
       $current_dir = getcwd();
-      chdir(DRUPAL_ROOT);
+      chdir(BACKDROP_ROOT);
 
-      // load the user object from Drupal
-      $drupaluser = user_load($drupaluid, TRUE);
+      // load the user object from Backdrop
+      $backdropuser = user_load($backdropuid, TRUE);
 
       chdir($current_dir);
 
       // get all the attributes out of the user object
-      $userAttrs = get_object_vars($drupaluser);
-      $wrapper = entity_metadata_wrapper('user', $drupaluser->uid);
+      $userAttrs = get_object_vars($backdropuser);
+      $wrapper = entity_metadata_wrapper('user', $backdropuser->uid);
 
       // define some variables to use as arrays
       $userAttrNames = null;
@@ -255,8 +254,8 @@ class sspmod_drupalauth_Auth_Source_External extends SimpleSAML_Auth_Source {
         // populate the attribute naming array
         foreach($this->attributes as $confAttr){
 
-            $userKeys[] = $confAttr['drupaluservar'];
-            $userAttrNames[$confAttr['drupaluservar']] = $confAttr['callit'];
+            $userKeys[] = $confAttr['backdropuservar'];
+            $userAttrNames[$confAttr['backdropuservar']] = $confAttr['callit'];
 
         }
 
@@ -303,8 +302,8 @@ class sspmod_drupalauth_Auth_Source_External extends SimpleSAML_Auth_Source {
         }
       }
 
-      chdir(DRUPAL_ROOT);
-      drupal_alter('drupalauth_attributes', $attributes, $drupaluser);
+      chdir(BACKDROP_ROOT);
+      backdrop_alter('backdropauth_attributes', $attributes, $backdropuser);
       chdir($current_dir);
 
       return $attributes;
@@ -318,7 +317,7 @@ class sspmod_drupalauth_Auth_Source_External extends SimpleSAML_Auth_Source {
 	 * @param array &$state  Information about the current authentication.
 	 */
 	public function authenticate(&$state) {
-		assert('is_array($state)');
+		assert(is_array($state));
 
 		$attributes = $this->getUser();
 		if ($attributes !== NULL) {
@@ -341,7 +340,7 @@ class sspmod_drupalauth_Auth_Source_External extends SimpleSAML_Auth_Source {
 		 * First we add the identifier of this authentication source
 		 * to the state array, so that we know where to resume.
 		 */
-		$state['drupalauth:AuthID'] = $this->authId;
+		$state['backdropauth:AuthID'] = $this->authId;
 
 
 		/*
@@ -357,14 +356,14 @@ class sspmod_drupalauth_Auth_Source_External extends SimpleSAML_Auth_Source {
 		 * and restores it in another location, and thus bypasses steps in
 		 * the authentication process.
 		 */
-		$stateId = SimpleSAML_Auth_State::saveState($state, 'drupalauth:External');
+		$stateId = \SimpleSAML\Auth\State::saveState($state, 'backdropauth:External');
 
 		/*
 		 * Now we generate an URL the user should return to after authentication.
 		 * We assume that whatever authentication page we send the user to has an
 		 * option to return the user to a specific page afterwards.
 		 */
-		$returnTo = SimpleSAML_Module::getModuleURL('drupalauth/resume.php', array(
+		$returnTo = \SimpleSAML\Module::getModuleURL('backdropauth/resume.php', array(
 			'State' => $stateId,
 		));
 
@@ -375,7 +374,7 @@ class sspmod_drupalauth_Auth_Source_External extends SimpleSAML_Auth_Source {
 		 * is also part of this module, but in a real example, this would likely be
 		 * the absolute URL of the login page for the site.
 		 */
-		$authPage = $this->drupal_login_url . '?ReturnTo=' . $returnTo;
+		$authPage = $this->backdrop_login_url . '?ReturnTo=' . $returnTo;
 
 		/*
 		 * The redirect to the authentication page.
@@ -383,14 +382,14 @@ class sspmod_drupalauth_Auth_Source_External extends SimpleSAML_Auth_Source {
 		 * Note the 'ReturnTo' parameter. This must most likely be replaced with
 		 * the real name of the parameter for the login page.
 		 */
-		SimpleSAML_Utilities::redirect($authPage, array(
+		\SimpleSAML\Utilities::redirect($authPage, array(
 			'ReturnTo' => $returnTo,
 		));
 
 		/*
 		 * The redirect function never returns, so we never get this far.
 		 */
-		assert('FALSE');
+		assert(FALSE);
 	}
 
 
@@ -409,7 +408,7 @@ class sspmod_drupalauth_Auth_Source_External extends SimpleSAML_Auth_Source {
 		 * it in the 'State' request parameter.
 		 */
 		if (!isset($_REQUEST['State'])) {
-			throw new SimpleSAML_Error_BadRequest('Missing "State" parameter.');
+			throw new \SimpleSAML\Error\BadRequest('Missing "State" parameter.');
 		}
 		$stateId = (string)$_REQUEST['State'];
 
@@ -417,19 +416,19 @@ class sspmod_drupalauth_Auth_Source_External extends SimpleSAML_Auth_Source {
 		 * Once again, note the second parameter to the loadState function. This must
 		 * match the string we used in the saveState-call above.
 		 */
-		$state = SimpleSAML_Auth_State::loadState($stateId, 'drupalauth:External');
+		$state = \SimpleSAML\Auth\State::loadState($stateId, 'backdropauth:External');
 
 		/*
 		 * Now we have the $state-array, and can use it to locate the authentication
 		 * source.
 		 */
-		$source = SimpleSAML_Auth_Source::getById($state['drupalauth:AuthID']);
+		$source = \SimpleSAML\Auth\Source::getById($state['backdropauth:AuthID']);
 		if ($source === NULL) {
 			/*
 			 * The only way this should fail is if we remove or rename the authentication source
 			 * while the user is at the login page.
 			 */
-			throw new SimpleSAML_Error_Exception('Could not find authentication source with id ' . $state[self::AUTHID]);
+			throw new \SimpleSAML\Error\Exception('Could not find authentication source with id ' . $state[self::AUTHID]);
 		}
 
 		/*
@@ -438,7 +437,7 @@ class sspmod_drupalauth_Auth_Source_External extends SimpleSAML_Auth_Source {
 		 * change config/authsources.php while an user is logging in.
 		 */
 		if (! ($source instanceof self)) {
-			throw new SimpleSAML_Error_Exception('Authentication source type changed.');
+			throw new \SimpleSAML\Error\Exception('Authentication source type changed.');
 		}
 
 
@@ -455,7 +454,7 @@ class sspmod_drupalauth_Auth_Source_External extends SimpleSAML_Auth_Source {
 			 * Here we simply throw an exception, but we could also redirect the user back to the
 			 * login page.
 			 */
-			throw new SimpleSAML_Error_Exception('User not authenticated after login page.');
+			throw new \SimpleSAML\Error\Exception('User not authenticated after login page.');
 		}
 
 		/*
@@ -464,12 +463,12 @@ class sspmod_drupalauth_Auth_Source_External extends SimpleSAML_Auth_Source {
 		 */
 
 		$state['Attributes'] = $attributes;
-		SimpleSAML_Auth_Source::completeAuth($state);
+		\SimpleSAML\Auth\Source::completeAuth($state);
 
 		/*
 		 * The completeAuth-function never returns, so we never get this far.
 		 */
-		assert('FALSE');
+		assert(FALSE);
 	}
 
 
@@ -480,7 +479,7 @@ class sspmod_drupalauth_Auth_Source_External extends SimpleSAML_Auth_Source {
 	 * @param array &$state  The logout state array.
 	 */
 	public function logout(&$state) {
-    assert('is_array($state)');
+    assert(is_array($state));
 
     if (!session_id()) {
       /* session_start not called before. Do it here. */
@@ -498,13 +497,13 @@ class sspmod_drupalauth_Auth_Source_External extends SimpleSAML_Auth_Source {
 
     }
 
-    $logout_url = $this->drupal_logout_url;
+    $logout_url = $this->backdrop_logout_url;
     if (!empty($state['ReturnTo'])) {
       $logout_url .= '?ReturnTo=' . $state['ReturnTo'];
     }
 
     /**
-     * Redirect the user to the Drupal logout page
+     * Redirect the user to the Backdrop logout page
      */
     header('Location: ' . $logout_url);
     die;

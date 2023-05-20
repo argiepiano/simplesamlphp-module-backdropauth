@@ -1,17 +1,17 @@
 <?php
 
 /**
- * Drupal authentication source for simpleSAMLphp
+ * Backdrop authentication source for simpleSAMLphp
  *
  * Copyright SIL International, Steve Moitozo, <steve_moitozo@sil.org>, http://www.sil.org 
  *
  * This class is a Drupal authentication source which authenticates users
  * against a Drupal site located on the same server.
  *
+ * This project is a port of drupalauth found at: 
+ * https://github.com/drupalauth/simplesamlphp-module-drupalauth
  *
- * The homepage of this project: http://code.google.com/p/drupalauth/
- *
- * !!! NOTE WELLL !!!
+ * !!! NOTE WELL !!!
  *
  * You must configure store.type in config/config.php to be something
  * other than phpsession, or this module will not work. SQL and memcache
@@ -22,25 +22,25 @@
  *
  * To use this put something like this into config/authsources.php:
  *	
- * 	'drupal-userpass' => array(
- * 		'drupalauth:UserPass',
+ * 	'backdrop-userpass' => array(
+ * 		'backdropauth:UserPass',
  * 
- * 		// The filesystem path of the Drupal directory.
- * 		'drupalroot' => '/var/www/drupal-7.0',
+ * 		// The filesystem path of the Backdrop directory.
+ * 		'backdroproot' => '/var/www/backdrop-1.0.0',
  * 
  * 		// Whether to turn on debug
  * 		'debug' => true,
  * 
- * 		// Which attributes should be retrieved from the Drupal site.				     
+ * 		// Which attributes should be retrieved from the Backdrop site.				     
  * 				     
  *              'attributes' => array(
- *                                    array('drupaluservar'   => 'uid',  'callit' => 'uid'),
- *                                     array('drupaluservar' => 'name', 'callit' => 'cn'),
- *                                     array('drupaluservar' => 'mail', 'callit' => 'mail'),
- *                                     array('drupaluservar' => 'field_first_name',  'callit' => 'givenName'),
- *                                     array('drupaluservar' => 'field_last_name',   'callit' => 'sn'),
- *                                     array('drupaluservar' => 'field_organization','callit' => 'ou'),
- *                                     array('drupaluservar' => 'roles','callit' => 'roles'),
+ *                                    array('backdropuservar'   => 'uid',  'callit' => 'uid'),
+ *                                     array('backdropuservar' => 'name', 'callit' => 'cn'),
+ *                                     array('backdropuservar' => 'mail', 'callit' => 'mail'),
+ *                                     array('backdropuservar' => 'field_first_name',  'callit' => 'givenName'),
+ *                                     array('backdropuservar' => 'field_last_name',   'callit' => 'sn'),
+ *                                     array('backdropuservar' => 'field_organization','callit' => 'ou'),
+ *                                     array('backdropuservar' => 'roles','callit' => 'roles'),
  *                                   ),
  * 	),
  * 
@@ -54,14 +54,14 @@
  *
  * If you want to pick and choose do it like this:
  * 'attributes' => array(
- * 		      array('drupaluservar' => 'uid',  'callit' => 'uid),
- *                     array('drupaluservar' => 'name', 'callit' => 'cn'),
- *                     array('drupaluservar' => 'mail', 'callit' => 'mail'),
- *                     array('drupaluservar' => 'roles','callit' => 'roles'),
+ * 		      array('backdropuservar' => 'uid',  'callit' => 'uid),
+ *                     array('backdropuservar' => 'name', 'callit' => 'cn'),
+ *                     array('backdropuservar' => 'mail', 'callit' => 'mail'),
+ *                     array('backdropuservar' => 'roles','callit' => 'roles'),
  *                      ),
  * 
- *  The value for 'drupaluservar' is the variable name for the attribute in the 
- *  Drupal user object.
+ *  The value for 'backdropuservar' is the variable name for the attribute in the 
+ *  Backdrop user object.
  * 
  *  The value for 'callit' is the name you want the attribute to have when it's
  *  returned after authentication. You can use the same value in both or you can
@@ -70,10 +70,10 @@
  *
  *
  * @author Steve Moitozo <steve_moitozo@sil.org>, SIL International
- * @package drupalauth
+ * @package backdropauth
  * @version $Id$
  */
-class sspmod_drupalauth_Auth_Source_UserPass extends sspmod_core_Auth_UserPassBase {
+class sspmod_backdropauth_Auth_Source_UserPass extends sspmod_core_Auth_UserPassBase {
 
 	/**
 	 * Whether to turn on debugging
@@ -81,12 +81,12 @@ class sspmod_drupalauth_Auth_Source_UserPass extends sspmod_core_Auth_UserPassBa
 	private $debug;
 
 	/**
-	 * The Drupal installation directory
+	 * The Backdrop installation directory
 	 */
-	private $drupalroot;
+	private $backdroproot;
 
 	/**
-	 * The Drupal user attributes to use, NULL means use all available
+	 * The Backdrop user attributes to use, NULL means use all available
 	 */
 	private $attributes;
 
@@ -98,38 +98,38 @@ class sspmod_drupalauth_Auth_Source_UserPass extends sspmod_core_Auth_UserPassBa
 	 * @param array $config  Configuration.
 	 */
 	public function __construct($info, $config) {
-		assert('is_array($info)');
-		assert('is_array($config)');
+		assert(is_array($info));
+		assert(is_array($config));
 
 		/* Call the parent constructor first, as required by the interface. */
 		parent::__construct($info, $config);
 		
 		/* Get the configuration for this module */	
-		$drupalAuthConfig = new sspmod_drupalauth_ConfigHelper($config,
+		$backdropAuthConfig = new sspmod_backdropauth_ConfigHelper($config,
 			'Authentication source ' . var_export($this->authId, TRUE));
 
-		$this->debug      = $drupalAuthConfig->getDebug();
-		$this->attributes = $drupalAuthConfig->getAttributes();
+		$this->debug      = $backdropAuthConfig->getDebug();
+		$this->attributes = $backdropAuthConfig->getAttributes();
 
-    if (!defined('DRUPAL_ROOT')) {
-      define('DRUPAL_ROOT', $drupalAuthConfig->getDrupalroot());
+    if (!defined('BACKDROP_ROOT')) {
+      define('BACKDROP_ROOT', $backdropAuthConfig->getBackdroproot());
     }
 
-		/* Include the Drupal bootstrap */
-    //require_once(DRUPAL_ROOT.'/includes/common.inc');
-    require_once(DRUPAL_ROOT.'/includes/bootstrap.inc');
-		require_once(DRUPAL_ROOT.'/includes/file.inc');
+		/* Include the Backdrop bootstrap */
+    //require_once(BACKDROP_ROOT.'/includes/common.inc');
+    require_once(BACKDROP_ROOT.'/core/includes/bootstrap.inc');
+		require_once(BACKDROP_ROOT.'/core/includes/file.inc');
 
-    /* Using DRUPAL_BOOTSTRAP_FULL means that SimpleSAMLphp must use an session storage
+    /* Using BACKDROP_BOOTSTRAP_FULL means that SimpleSAMLphp must use an session storage
      * mechanism other than phpsession (see: store.type in config.php). However, this trade-off
      * prevents the need for hackery here and makes this module work better in different environments.
      */
-		drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
+		backdrop_bootstrap(BACKDROP_BOOTSTRAP_FULL);
 		
-		// we need to be able to call Drupal user function so we load some required modules
-    drupal_load('module', 'system');
-		drupal_load('module', 'user');
-		drupal_load('module', 'field');
+		// we need to be able to call Backdrop user function so we load some required modules
+    backdrop_load('module', 'system');
+		backdrop_load('module', 'user');
+		backdrop_load('module', 'field');
 
 	}
 
@@ -139,7 +139,7 @@ class sspmod_drupalauth_Auth_Source_UserPass extends sspmod_core_Auth_UserPassBa
 	 *
 	 * On a successful login, this function should return the users attributes. On failure,
 	 * it should throw an exception. If the error was caused by the user entering the wrong
-	 * username or password, a SimpleSAML_Error_Error('WRONGUSERPASS') should be thrown.
+	 * username or password, a \SimpleSAML\Error_Error('WRONGUSERPASS') should be thrown.
 	 *
 	 * Note that both the username and the password are UTF-8 encoded.
 	 *
@@ -148,20 +148,20 @@ class sspmod_drupalauth_Auth_Source_UserPass extends sspmod_core_Auth_UserPassBa
 	 * @return array  Associative array with the users attributes.
 	 */
 	protected function login($username, $password) {
-		assert('is_string($username)');
-		assert('is_string($password)');
+		assert(is_string($username));
+		assert(is_string($password));
 
 		// authenticate the user
-		$drupaluid = user_authenticate($username, $password);
-		if(0 == $drupaluid){
-			throw new SimpleSAML_Error_Error('WRONGUSERPASS');
+		$backdropuid = user_authenticate($username, $password);
+		if(0 == $backdropuid){
+			throw new \SimpleSAML\Error\Error('WRONGUSERPASS');
 		}
 
-		// load the user object from Drupal
-		$drupaluser = user_load($drupaluid);
+		// load the user object from Backdrop
+		$backdropuser = user_load($backdropuid);
 
 		// get all the attributes out of the user object
-		$userAttrs = get_object_vars($drupaluser);
+		$userAttrs = get_object_vars($backdropuser);
 		
 		// define some variables to use as arrays
 		$userAttrNames = null;
@@ -181,8 +181,8 @@ class sspmod_drupalauth_Auth_Source_UserPass extends sspmod_core_Auth_UserPassBa
 		   // populate the attribute naming array
 		   foreach($this->attributes as $confAttr){
 		   
-		      $userKeys[] = $confAttr['drupaluservar'];
-		      $userAttrNames[$confAttr['drupaluservar']] = $confAttr['callit'];
+		      $userKeys[] = $confAttr['backdropuservar'];
+		      $userAttrNames[$confAttr['backdropuservar']] = $confAttr['callit'];
 		   
 		   }
 		   

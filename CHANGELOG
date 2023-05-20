@@ -5,5 +5,5 @@
     Expanded the use of the salted hash to ensure that an attacker cannot change the uid of the authenticated Drupal user by manipulating the value of a cookie.
 
     Modified files:
-      drupal_module/drupalauth4ssp/drupalauth4ssp.module - concatenate uid with salt before hashing
+      drupal_module/backdropauth4ssp/backdropauth4ssp.module - concatenate uid with salt before hashing
       lib/Auth/Source/External.php - concatenate uid with salt before hashing and minor adjustments

@@ -9,4 +9,4 @@
  * @package simpleSAMLphp
  * @version $Id$
  */
-sspmod_drupalauth_Auth_Source_External::resume();
+sspmod_backdropauth_Auth_Source_External::resume();

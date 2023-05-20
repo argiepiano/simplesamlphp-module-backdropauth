@@ -1,7 +1,7 @@
 {
-  "name": "drupalauth/simplesamlphp-module-drupalauth",
+  "name": "backdropauth/simplesamlphp-module-backdropauth",
   "description": "A SimpleSAMLphp module adding support for Drupal as the authentication source.",
-  "homepage": "https://github.com/drupalauth/simplesamlphp-module-drupalauth",
+  "homepage": "https://github.com/backdropauth/simplesamlphp-module-backdropauth",
   "type": "simplesamlphp-module",
   "keywords": [
     "SimpleSAMLphp",
@@ -16,7 +16,7 @@
     },
     {
       "name": "Contributors",
-      "homepage": "https://github.com/drupalauth/simplesamlphp-module-drupalauth/graphs/contributors",
+      "homepage": "https://github.com/backdropauth/simplesamlphp-module-backdropauth/graphs/contributors",
       "role": "Contributors"
     }
   ],

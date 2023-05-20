@@ -1,24 +1,24 @@
 <?php
 
 /**
- * Drupal authentication source configuration parser.
+ * Backdrop authentication source configuration parser.
+ * 
+ * This project is a port of drupalauth found at: 
+ * https://github.com/drupalauth/simplesamlphp-module-drupalauth
  *
  * Copyright SIL International, Steve Moitozo, <steve_moitozo@sil.org>, http://www.sil.org 
  *
- * This class is a Drupal authentication source which authenticates users
- * against a Drupal site located on the same server.
+ * This class is a Backdrop authentication source which authenticates users
+ * against a Backdrop site located on the same server.
  *
- *
- * The homepage of this project: http://code.google.com/p/drupalauth/
- *
- * See the drupalauth-entry in config-templates/authsources.php for information about
+ * See the backdropauth-entry in config-templates/authsources.php for information about
  * configuration of these options.
  *
  * @author Steve Moitozo <steve_moitozo@sil.org>, SIL International
- * @package drupalauth
+ * @package backdropauth
  * @version $Id$
  */
-class sspmod_drupalauth_ConfigHelper {
+class sspmod_backdropauth_ConfigHelper {
 
 
 	/**
@@ -31,7 +31,7 @@ class sspmod_drupalauth_ConfigHelper {
 	/**
 	 * The filesystem path to the Drupal directory
 	 */
-	private $drupalroot;
+	private $backdroproot;
 
 
 	/**
@@ -57,13 +57,13 @@ class sspmod_drupalauth_ConfigHelper {
   /**
    * The Drupal logout URL
    */
-  private $drupal_logout_url;
+  private $backdrop_logout_url;
 
 
   /**
    * The Drupal login URL
    */
-  private $drupal_login_url;
+  private $backdrop_login_url;
 
 
 	/**
@@ -79,14 +79,14 @@ class sspmod_drupalauth_ConfigHelper {
 		$this->location = $location;
 
 		/* Parse configuration. */
-		$config = SimpleSAML_Configuration::loadFromArray($config, $location);
+		$config = \SimpleSAML\Configuration::loadFromArray($config, $location);
 
-		$this->drupalroot = $config->getString('drupalroot');
+		$this->backdroproot = $config->getString('backdroproot');
 		$this->debug = $config->getBoolean('debug', FALSE);
     $this->attributes = $config->getArray('attributes', NULL);
-    $this->cookie_name = $config->getString('cookie_name', 'drupalauth4ssp');
-    $this->drupal_logout_url = $config->getString('drupal_logout_url', NULL);
-    $this->drupal_login_url = $config->getString('drupal_login_url', NULL);
+    $this->cookie_name = $config->getString('cookie_name', 'backdropauth4ssp');
+    $this->backdrop_logout_url = $config->getString('backdrop_logout_url', NULL);
+    $this->backdrop_login_url = $config->getString('backdrop_login_url', NULL);
 
 	}
 	
@@ -103,10 +103,10 @@ class sspmod_drupalauth_ConfigHelper {
 	/**
 	 * Return the drupaldir
 	 *
-	 * @param string $drupalroot the directory of the Drupal site
+	 * @param string $backdroproot the directory of the Drupal site
 	 */
-	public function getDrupalroot() {
-	   return $this->drupalroot; 
+	public function getBackdroproot() {
+	   return $this->backdroproot; 
 	}
 
   /**
@@ -130,19 +130,19 @@ class sspmod_drupalauth_ConfigHelper {
   /**
    * Return the Drupal logout URL
    *
-   * @param array $drupal_logout_url the URL of the Drupal logout page
+   * @param array $backdrop_logout_url the URL of the Drupal logout page
    */
-  public function getDrupalLogoutURL() {
-     return $this->drupal_logout_url;
+  public function getBackdropLogoutURL() {
+     return $this->backdrop_logout_url;
   }
 
   /**
    * Return the Drupal login URL
    *
-   * @param array $drupal_login_url the URL of the Drupal login page
+   * @param array $backdrop_login_url the URL of the Drupal login page
    */
-  public function getDrupalLoginURL() {
-     return $this->drupal_login_url;
+  public function getBackdropLoginURL() {
+     return $this->backdrop_login_url;
   }
 
 }
