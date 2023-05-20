@@ -124,6 +124,8 @@ Configure the authentication source by putting following code into `simplesamlph
 ## Credits
 This is a Backdrop CMS ported version of a project originally created for Backdrop 7, which is currently available at https://github.com/drupalauth/simplesamlphp-module-drupalauth
 
+Originally written by Steve Moitozo steve_moitozo@sil.org
+
 This ported version is based on the 1.7.x branch of that original project. The commit history of that branch has been preserved here. We are very thankful to all past contributors to the Backdrop branch that have made this port possible. 
 
 - Ported by [argiepiano](https://github.com/argiepiano)
