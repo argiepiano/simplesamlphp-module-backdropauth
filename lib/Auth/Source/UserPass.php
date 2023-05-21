@@ -73,7 +73,7 @@
  * @package backdropauth
  * @version $Id$
  */
-class sspmod_backdropauth_Auth_Source_UserPass extends sspmod_core_Auth_UserPassBase {
+class sspmod_backdropauth_Auth_Source_UserPass extends \SimpleSAML\Module\core\Auth\UserPassBase {
 
 	/**
 	 * Whether to turn on debugging
@@ -113,24 +113,27 @@ class sspmod_backdropauth_Auth_Source_UserPass extends sspmod_core_Auth_UserPass
 
     if (!defined('BACKDROP_ROOT')) {
       define('BACKDROP_ROOT', $backdropAuthConfig->getBackdroproot());
+      /* Include the Backdrop bootstrap */
+      require_once(BACKDROP_ROOT.'/core/includes/bootstrap.inc');
+      require_once(BACKDROP_ROOT.'/core/includes/file.inc');
+
+      // Fool the bootstrap process to think we are calling it from root.
+      $current_dir = getcwd();
+      chdir(BACKDROP_ROOT);
+
+      /* Using BACKDROP_BOOTSTRAP_FULL means that SimpleSAMLphp must use an session storage
+      * mechanism other than phpsession (see: store.type in config.php). However, this trade-off
+      * prevents the need for hackery here and makes this module work better in different environments.
+      */
+      backdrop_bootstrap(BACKDROP_BOOTSTRAP_FULL);
+      
+      // we need to be able to call Backdrop user function so we load some required modules
+      backdrop_load('module', 'system');
+      backdrop_load('module', 'user');
+      backdrop_load('module', 'field');
+
+      chdir($current_dir);
     }
-
-		/* Include the Backdrop bootstrap */
-    //require_once(BACKDROP_ROOT.'/includes/common.inc');
-    require_once(BACKDROP_ROOT.'/core/includes/bootstrap.inc');
-		require_once(BACKDROP_ROOT.'/core/includes/file.inc');
-
-    /* Using BACKDROP_BOOTSTRAP_FULL means that SimpleSAMLphp must use an session storage
-     * mechanism other than phpsession (see: store.type in config.php). However, this trade-off
-     * prevents the need for hackery here and makes this module work better in different environments.
-     */
-		backdrop_bootstrap(BACKDROP_BOOTSTRAP_FULL);
-		
-		// we need to be able to call Backdrop user function so we load some required modules
-    backdrop_load('module', 'system');
-		backdrop_load('module', 'user');
-		backdrop_load('module', 'field');
-
 	}
 
 
@@ -150,6 +153,10 @@ class sspmod_backdropauth_Auth_Source_UserPass extends sspmod_core_Auth_UserPass
 	protected function login($username, $password) {
 		assert(is_string($username));
 		assert(is_string($password));
+
+    // Fool Backdrop to think we are calling it from root.
+    $current_dir = getcwd();
+    chdir(BACKDROP_ROOT);
 
 		// authenticate the user
 		$backdropuid = user_authenticate($username, $password);
@@ -217,7 +224,7 @@ class sspmod_backdropauth_Auth_Source_UserPass extends sspmod_core_Auth_UserPass
 
 		  }
 		}
-						    
+    chdir($current_dir);
 		return $attributes;
 	}
 

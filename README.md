@@ -42,27 +42,41 @@ Configure the authentication source by putting following code into `simplesamlph
 ```php
 'backdrop-userpass' => array('backdropauth:External',
 
- // The filesystem path of the Backdrop directory.
- 'backdroproot' => '/var/www/backdrop',
+  // The filesystem path of the Backdrop directory.
+  'backdroproot' => '/var/www/backdrop',
 
- // Whether to turn on debug
- 'debug' => true,
+  // Whether to turn on debug
+  'debug' => true,
 
- // the URL of the Backdrop logout page
- 'backdrop_logout_url' => 'https://www.example.com/user/logout',
+  // the URL of the Backdrop logout page
+  'backdrop_logout_url' => 'https://www.example.com/user/logout',
 
- // the URL of the Backdrop login page
- 'backdrop_login_url' => 'https://www.example.com/user/login',
+  // the URL of the Backdrop login page
+  'backdrop_login_url' => 'https://www.example.com/user/login',
 
- // Which attributes should be retrieved from the Backdrop site.
- 'attributes' => array(
-   array('backdropuservar'   => 'uid',  'callit' => 'uid'),
-   array('backdropuservar' => 'name', 'callit' => 'cn'),
-   array('backdropuservar' => 'mail', 'callit' => 'mail'),
-   array('backdropuservar' => 'field_first_name',  'callit' => 'givenName'),
-   array('backdropuservar' => 'field_last_name',   'callit' => 'sn'),
-   array('backdropuservar' => 'field_organization','callit' => 'ou'),
-   array('backdropuservar' => 'roles','callit' => 'roles'),
+  // The domain of the cookie that contains the uid of the logged in use.
+  // This can only be set to the domain of the IdP site, or to a subdomain. 
+  // Modern browsers will not allow setting this to a domain different from
+  // the current one, or a subdomain of itself. Valid domains for an idp site
+  // hosted at https://example.com are:
+  // 'cookie_domain' => 'example.com', OR
+  // 'cookie_domain' => '.example.com' // for all subdomains.
+  // If left empty, the domain name of the IdP site will be used.
+  'cookie_domain' => '.bdentity.localhost',
+
+  // The name of the cookie. This cookie is used to provide the uid to the 
+  // SP site. Default: backdropauth5ssp. 
+  // 'cookie_name' => 'backdropauth5ssp',
+
+  // Which attributes should be retrieved from the Backdrop site.
+  'attributes' => array(
+    array('backdropuservar'   => 'uid',  'callit' => 'uid'),
+    array('backdropuservar' => 'name', 'callit' => 'cn'),
+    array('backdropuservar' => 'mail', 'callit' => 'mail'),
+    array('backdropuservar' => 'field_first_name',  'callit' => 'givenName'),
+    array('backdropuservar' => 'field_last_name',   'callit' => 'sn'),
+    array('backdropuservar' => 'field_organization','callit' => 'ou'),
+    array('backdropuservar' => 'roles','callit' => 'roles'),
   ),
 ),
 ```
