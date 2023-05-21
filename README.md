@@ -57,12 +57,11 @@ Configure the authentication source by putting following code into `simplesamlph
   // The domain of the cookie that contains the uid of the logged in use.
   // This can only be set to the domain of the IdP site, or to a subdomain. 
   // Modern browsers will not allow setting this to a domain different from
+  // If left empty, the domain name of the IdP site will be used.
   // the current one, or a subdomain of itself. Valid domains for an idp site
   // hosted at https://example.com are:
   // 'cookie_domain' => 'example.com', OR
   // 'cookie_domain' => '.example.com' // for all subdomains.
-  // If left empty, the domain name of the IdP site will be used.
-  'cookie_domain' => '.bdentity.localhost',
 
   // The name of the cookie. This cookie is used to provide the uid to the 
   // SP site. Default: backdropauth5ssp. 
