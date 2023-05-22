@@ -29,7 +29,7 @@ If you want to connect your Backdrop site as Service Provider to a SAML or Shibb
 6. Configure the authentication source in `simplesamlphp/config/authsources.php` as described below.
 
 ### SimpleSAMLphp example configuration
-For an example configuration, check the wiki pages for the [backdropauth4ssp](https://github.com/backdrop-contrib/backdropauth4ssp) module.
+For an example configuration, check the [wiki pages](https://github.com/backdrop-contrib/backdropauth4ssp/wiki/Sample-configuration-for-backdropauth4ssp) for the [backdropauth4ssp](https://github.com/backdrop-contrib/backdropauth4ssp) module.
 
 ### Additional configurations: Authenticate against Backdrop and use the Backdrop login page
 
