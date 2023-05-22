@@ -139,16 +139,16 @@ class sspmod_backdropauth_Auth_Source_External extends \SimpleSAML\Auth\Source {
 	 * Constructor for this authentication source.
 	 *
 	 * @param array $info  Information about this authentication source.
-	 * @param array $config  Configuration.
+	 * @param array $configuration  Configuration.
 	 */
-	public function __construct(array $info, array $config) {
+	public function __construct(array $info, array $configuration) {
 
     /* Call the parent constructor first, as required by the interface. */
-    parent::__construct($info, $config);
+    parent::__construct($info, $configuration);
 
 
     /* Get the configuration for this module */
-    $backdropAuthConfig = new sspmod_backdropauth_ConfigHelper($config,
+    $backdropAuthConfig = new sspmod_backdropauth_ConfigHelper($configuration,
       'Authentication source ' . var_export($this->authId, TRUE));
 
     $this->debug       = $backdropAuthConfig->getDebug();
@@ -157,34 +157,39 @@ class sspmod_backdropauth_Auth_Source_External extends \SimpleSAML\Auth\Source {
     $this->backdrop_logout_url = $backdropAuthConfig->getBackdropLogoutURL();
     $this->backdrop_login_url = $backdropAuthConfig->getBackdropLoginURL();
 
-    if (!defined('BACKDROP_ROOT')) {
-      define('BACKDROP_ROOT', $backdropAuthConfig->getBackdroproot());
-    }
-
     $ssp_config = \SimpleSAML\Configuration::getInstance();
     $this->cookie_path = '/' . $ssp_config->getValue('baseurlpath');
     $this->cookie_salt = $ssp_config->getValue('secretsalt');
 
-    $a = getcwd();
-    chdir(BACKDROP_ROOT);
-
-    /* Include the Backdrop bootstrap */
-    //require_once(BACKDROP_ROOT.'/includes/common.inc');
-    require_once(BACKDROP_ROOT.'/core/includes/bootstrap.inc');
-    require_once(BACKDROP_ROOT.'/core/includes/file.inc');
-
-    /* Using BACKDROP_BOOTSTRAP_FULL means that SimpleSAMLphp must use an session storage
-     * mechanism other than phpsession (see: store.type in config.php). However, this trade-off
-     * prevents the need for hackery here and makes this module work better in different environments.
-     */
-    backdrop_bootstrap(BACKDROP_BOOTSTRAP_FULL);
-
-    // we need to be able to call Backdrop user function so we load some required modules
-    backdrop_load('module', 'system');
-    backdrop_load('module', 'user');
-    backdrop_load('module', 'field');
-
-    chdir($a);
+    if (!defined('BACKDROP_ROOT')) {
+      define('BACKDROP_ROOT', $backdropAuthConfig->getBackdroproot());
+      // To avoid a collision between global variables $config from SimpleSAML and
+      // Backdrop, we temporarily store SimpleSAML's variable while bootstrapping.
+      global $config;
+      $simplesmal_config = $config;
+      $config = NULL;
+      $current_dir = getcwd();
+      chdir(BACKDROP_ROOT);
+  
+      /* Include the Backdrop bootstrap */
+      //require_once(BACKDROP_ROOT.'/includes/common.inc');
+      require_once(BACKDROP_ROOT.'/core/includes/bootstrap.inc');
+      require_once(BACKDROP_ROOT.'/core/includes/file.inc');
+  
+      /* Using BACKDROP_BOOTSTRAP_FULL means that SimpleSAMLphp must use an session storage
+       * mechanism other than phpsession (see: store.type in config.php). However, this trade-off
+       * prevents the need for hackery here and makes this module work better in different environments.
+       */
+      backdrop_bootstrap(BACKDROP_BOOTSTRAP_FULL);
+  
+      // we need to be able to call Backdrop user function so we load some required modules
+      backdrop_load('module', 'system');
+      backdrop_load('module', 'user');
+      backdrop_load('module', 'field');
+  
+      chdir($current_dir);
+      $config = $simplesmal_config;
+    }
   }
 
 
@@ -224,13 +229,16 @@ class sspmod_backdropauth_Auth_Source_External extends \SimpleSAML\Auth\Source {
 
     if (!empty($backdropuid)) {
 
+      global $config;
+      $simplesaml_config = $config;
+      $config = NULL;
       $current_dir = getcwd();
       chdir(BACKDROP_ROOT);
 
       // load the user object from Backdrop
       $backdropuser = user_load($backdropuid, TRUE);
 
-      chdir($current_dir);
+      // chdir($current_dir);
 
       // get all the attributes out of the user object
       $userAttrs = get_object_vars($backdropuser);
@@ -302,9 +310,10 @@ class sspmod_backdropauth_Auth_Source_External extends \SimpleSAML\Auth\Source {
         }
       }
 
-      chdir(BACKDROP_ROOT);
+      // chdir(BACKDROP_ROOT);
       backdrop_alter('backdropauth_attributes', $attributes, $backdropuser);
       chdir($current_dir);
+      $config = $simplesaml_config;
 
       return $attributes;
     }

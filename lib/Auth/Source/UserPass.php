@@ -121,6 +121,12 @@ class sspmod_backdropauth_Auth_Source_UserPass extends \SimpleSAML\Module\core\A
       $current_dir = getcwd();
       chdir(BACKDROP_ROOT);
 
+      // To avoid collisions between global $config in Bd and ssp, we temporarily
+      // store ssp's $config. 
+      global $config;
+      $simplesaml_config = $config;
+      $config = NULL;
+
       /* Using BACKDROP_BOOTSTRAP_FULL means that SimpleSAMLphp must use an session storage
       * mechanism other than phpsession (see: store.type in config.php). However, this trade-off
       * prevents the need for hackery here and makes this module work better in different environments.
@@ -132,7 +138,8 @@ class sspmod_backdropauth_Auth_Source_UserPass extends \SimpleSAML\Module\core\A
       backdrop_load('module', 'user');
       backdrop_load('module', 'field');
 
-      chdir($current_dir);
+     chdir($current_dir);
+     $config = $simplesaml_config;
     }
 	}
 
@@ -154,9 +161,15 @@ class sspmod_backdropauth_Auth_Source_UserPass extends \SimpleSAML\Module\core\A
 		assert(is_string($username));
 		assert(is_string($password));
 
-    // Fool Backdrop to think we are calling it from root.
+    // Fool the bootstrap process to think we are calling it from root.
     $current_dir = getcwd();
     chdir(BACKDROP_ROOT);
+
+    // To avoid collisions between global $config in Bd and ssp, we temporarily
+    // store ssp's $config. 
+    global $config;
+    $simplesaml_config = $config;
+    $config = NULL;
 
 		// authenticate the user
 		$backdropuid = user_authenticate($username, $password);
@@ -225,6 +238,7 @@ class sspmod_backdropauth_Auth_Source_UserPass extends \SimpleSAML\Module\core\A
 		  }
 		}
     chdir($current_dir);
+    $config = $simplesaml_config;
 		return $attributes;
 	}
 
